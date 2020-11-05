@@ -7,22 +7,23 @@ import java.io.IOException;
 
 public class App {
 
+    private static String[] sites = new String[]{"https://www.bbc.com/", "https://index.hu/", "https://www.telegraph.co.uk/"};
+
     public static void main(String[] args) throws IOException {
 
         long start = System.currentTimeMillis();
-        Downloader downloaderOne = new Downloader("https://www.bbc.com/", "src/main/outputs/bbc.html");
-        downloaderOne.download();
-        System.out.println("BBC done");
-        System.out.println("Time: " + (System.currentTimeMillis() - start) + " ms");
-        Downloader downloaderTwo = new Downloader("https://index.hu/", "src/main/outputs/index.html");
-        downloaderTwo.download();
-        System.out.println("Index done");
-        System.out.println("Time: " + (System.currentTimeMillis() - start) + " ms");
-        Downloader downloaderThree = new Downloader("https://www.telegraph.co.uk/", "src/main/outputs/telegraph.html");
-        downloaderThree.download();
-        System.out.println("Telegraph done");
-        System.out.println("Overall: " + (System.currentTimeMillis() - start) + " ms");
+
+        for (int i = 0; i < sites.length; i++) {
+            Downloader downloader = new Downloader(sites[i], "src/main/outputs/site" + (i + 1) + ".html");
+            downloader.download();
+            System.out.println("site " + (i + 1) + " done");
+
+            long end = System.currentTimeMillis();
+
+            System.out.println("Time: " + (end - start) + " ms");
+            start = end;
+        }
 
     }
-
 }
+
