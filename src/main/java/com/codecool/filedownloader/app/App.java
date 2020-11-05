@@ -5,6 +5,7 @@ import com.codecool.filedownloader.network.Downloader;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 public class App {
@@ -17,6 +18,7 @@ public class App {
             "https://edition.cnn.com/",
             "https://news.sky.com/",
             "https://www.rtl.de/"};
+
     private static ExecutorService executor = Executors.newCachedThreadPool();
 
     public static void main(String[] args) throws IOException {
@@ -48,9 +50,22 @@ public class App {
         long start = System.currentTimeMillis();
 
         for (int i = 0; i < sites.length; i++) {
-            downloadSite(i, "src/main/multi-output/site", true);
+            int currentSite = i;
+            executor.submit(() -> {
+                try {
+                    downloadSite(currentSite, "src/main/multi-output/site", true);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         }
 
+        executor.shutdown();
+        try {
+            executor.awaitTermination(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         long end = System.currentTimeMillis();
         System.out.println("OVERALL TIME: " + (end - start) + " ms");
 
