@@ -20,6 +20,9 @@ public class Downloader {
     }
 
     public void download() throws IOException {
+        long start = System.currentTimeMillis();
         fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+        System.out.println("site " + url + " done");
+        System.out.println("Time: " + (System.currentTimeMillis() - start) + " ms");
     }
 }

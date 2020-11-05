@@ -16,13 +16,10 @@ public class App {
         for (int i = 0; i < sites.length; i++) {
             Downloader downloader = new Downloader(sites[i], "src/main/outputs/site" + (i + 1) + ".html");
             downloader.download();
-            System.out.println("site " + (i + 1) + " done");
-
-            long end = System.currentTimeMillis();
-
-            System.out.println("Time: " + (end - start) + " ms");
-            start = end;
         }
+
+        long end = System.currentTimeMillis();
+        System.out.println("OVERALL TIME: " + (end - start) + " ms");
 
     }
 }
