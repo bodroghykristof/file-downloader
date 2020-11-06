@@ -12,12 +12,13 @@ import java.util.Map;
 
 public class App {
 
-    private static final int REPEATS = 5;
+    private static final int REPEATS = 1;
     private static final int THREADS = 4;
     private static Map<String, String> sites = new HashMap<>();
 
     static {
-        sites.put("https://www.bbc.com/", "bbc");
+        // 1GB file for later testing
+//        sites.put("http://www.fsn.hu/testfiles/1GiB", "bbc");
         sites.put("https://index.hu/", "index");
         sites.put("https://www.telegraph.co.uk/", "telegraph");
         sites.put("https://telex.hu/","telex");
@@ -33,8 +34,12 @@ public class App {
         Logger logger = new ConsoleLogger();
         ProgressManager progressManager = new ProgressManager(logger, THREADS, REPEATS);
         createDownloads(progressManager);
+
         progressManager.downloadFilesWithOneThread();
-        progressManager.resetProgresses();
+//
+//        progressManager.resetProgresses();
+
+
         try {
             Thread.sleep(1000);
             logger.clearScreen();
@@ -46,7 +51,7 @@ public class App {
         /* Two different behaviours can be observed depending on whether single-thread operation
         was performed beforehand or not */
 
-        progressManager.downloadFilesWithMultipleThreads();
+//        progressManager.downloadFilesWithMultipleThreads();
     }
 
 
