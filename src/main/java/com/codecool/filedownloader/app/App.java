@@ -19,6 +19,9 @@ public class App {
     static {
         // 1GB file for later testing
 //        sites.put("http://www.fsn.hu/testfiles/1GiB", "bbc");
+
+        //https://meet.google.com/linkredirect?authuser=0&dest=https%3A%2F%2Fdlcdnets.asus.com%2Fpub%2FASUS%2Fnb%2FDriversForWin10%2FVGA%2FGraphic_IGCC_DCH_Intel_F_V27.20.100.8190_18337.exe
+
         sites.put("https://index.hu/", "index");
         sites.put("https://www.telegraph.co.uk/", "telegraph");
         sites.put("https://telex.hu/","telex");
