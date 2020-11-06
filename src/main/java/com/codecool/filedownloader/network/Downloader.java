@@ -33,6 +33,10 @@ public class Downloader {
         return domain;
     }
 
+    public double getProgress() {
+        return progress;
+    }
+
     public void progress(double progress) {
         this.progress += progress;
     }

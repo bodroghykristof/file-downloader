@@ -33,9 +33,8 @@ public class App {
         Logger logger = new ConsoleLogger();
         ProgressManager progressManager = new ProgressManager(logger, THREADS, REPEATS);
         createDownloads(progressManager);
-        progressManager.downloadFilesWithOneThread();
+//        progressManager.downloadFilesWithOneThread();
         progressManager.downloadFilesWithMultipleThreads();
-
     }
 
 
