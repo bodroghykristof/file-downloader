@@ -1,96 +1,49 @@
 package com.codecool.filedownloader.app;
 
 import com.codecool.filedownloader.network.Downloader;
+import com.codecool.filedownloader.progress.ProgressManager;
+import com.codecool.filedownloader.view.ConsoleLogger;
+import com.codecool.filedownloader.view.Logger;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class App {
 
-    private static final int repeats = 5;
-    private static String[] sites = new String[]{"https://www.bbc.com/",
-            "https://index.hu/",
-            "https://www.telegraph.co.uk/",
-            "https://telex.hu/",
-            "https://www.origo.hu/index.html",
-            "https://edition.cnn.com/",
-            "https://news.sky.com/",
-            "https://www.rtl.de/"};
+    private static final int REPEATS = 5;
+    private static final int THREADS = 4;
+    private static Map<String, String> sites = new HashMap<>();
 
-    private static ExecutorService executor = Executors.newFixedThreadPool(4);
+    static {
+        sites.put("https://www.bbc.com/", "bbc");
+        sites.put("https://index.hu/", "index");
+        sites.put("https://www.telegraph.co.uk/", "telegraph");
+        sites.put("https://telex.hu/","telex");
+        sites.put("https://www.origo.hu/index.html", "origo");
+        sites.put("https://edition.cnn.com/", "cnn");
+        sites.put("https://news.sky.com/", "sky");
+        sites.put("https://www.rtl.de/", "rtl");
+    }
+
 
     public static void main(String[] args) throws IOException {
 
-//         First running tends to take more time, so it is not considered as a valid measurement
-        downloadSingleThread(false);
-
-        // Measurements
-        downloadSingleThread(true);
-        downloadMultiThread();
-
+        Logger logger = new ConsoleLogger();
+        ProgressManager progressManager = new ProgressManager(logger, THREADS, REPEATS);
+        createDownloads(progressManager);
+//        progressManager.downloadFilesWithOneThread();
+        progressManager.downloadFilesWithMultipleThreads();
     }
 
-    private static void downloadSingleThread(boolean logging) {
-        if (logging) System.out.println("SOLUTION USING A SINGLE THREAD");
-        else System.out.println("Preparing for measurement...");
-        long start = System.currentTimeMillis();
 
-        for (int i = 0; i < sites.length; i++) {
-            for (int j = 0; j < repeats; j++) {
-                downloadSite(i, "src/main/single-output/site", logging);
-            }
-        }
-
-        long end = System.currentTimeMillis();
-        if (logging) System.out.println("OVERALL TIME: " + (end - start) + " ms");
-    }
-
-    private static void downloadMultiThread() {
-        System.out.println("SOLUTION USING MULTI-THREADING");
-        long start = System.currentTimeMillis();
-
-        for (int i = 0; i < sites.length; i++) {
-            int currentSite = i;
-
-            // If inner for-cycle is inside of Runnable average execution time is ca. 6-6.5 sec
-
-            for (int j = 0; j < repeats; j++) {
-                executor.submit(() -> {
-
-                    downloadSite(currentSite, "src/main/multi-output/site", true);
-                });
-            }
-        }
-
-        executor.shutdown();
-        try {
-            executor.awaitTermination(12, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        long end = System.currentTimeMillis();
-        System.out.println("OVERALL TIME: " + (end - start) + " ms");
-
-    }
-
-    private static void downloadSite(int siteNumber, String path, boolean logging) {
-
-        try {
-            Downloader downloader = new Downloader(sites[siteNumber], path + (siteNumber + 1) + ".html");
-            long startPiece = System.currentTimeMillis();
-
-            downloader.download();
-
-            if (logging) {
-                System.out.println("site " + sites[siteNumber] + " done");
-                System.out.println("Time: " + (System.currentTimeMillis() - startPiece) + " ms");
-            }
-        } catch (IOException e) {
-            System.out.println("Could not download file " + (siteNumber + 1) + ".html");
+    private static void createDownloads(ProgressManager progressManager) throws IOException {
+        for (String site : sites.keySet()) {
+            Downloader downloader = new Downloader(site, sites.get(site));
+            progressManager.addDownloadProcess(downloader);
         }
     }
+
 }
 
