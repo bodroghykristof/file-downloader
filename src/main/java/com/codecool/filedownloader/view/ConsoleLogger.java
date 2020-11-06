@@ -11,7 +11,7 @@ public class ConsoleLogger implements Logger {
         clearScreen();
 
         for (DownloadLogData download : downloads) {
-            System.out.println(download.getDomain() + ": " + (100 * download.getProgress()) + "%");
+            System.out.printf("%s: %.0f%%%n", download.getDomain(), (download.getProgress() * 100));
         }
 
     }
