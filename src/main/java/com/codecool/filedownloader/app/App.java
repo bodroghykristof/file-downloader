@@ -24,73 +24,53 @@ public class App {
 
     public static void main(String[] args) throws IOException {
 
-//         First running tends to take more time, so it is not considered as a valid measurement
-        downloadSingleThread(false);
-
-        // Measurements
-        downloadSingleThread(true);
+        downloadSingleThread();
         downloadMultiThread();
 
     }
 
-    private static void downloadSingleThread(boolean logging) {
-        if (logging) System.out.println("SOLUTION USING A SINGLE THREAD");
-        else System.out.println("Preparing for measurement...");
-        long start = System.currentTimeMillis();
+    private static void downloadSingleThread() {
 
         for (int i = 0; i < sites.length; i++) {
             for (int j = 0; j < repeats; j++) {
-                downloadSite(i, "src/main/single-output/site", logging);
+                downloadSite(i, "src/main/single-output/site");
             }
         }
 
-        long end = System.currentTimeMillis();
-        if (logging) System.out.println("OVERALL TIME: " + (end - start) + " ms");
     }
 
     private static void downloadMultiThread() {
-        System.out.println("SOLUTION USING MULTI-THREADING");
-        long start = System.currentTimeMillis();
 
         for (int i = 0; i < sites.length; i++) {
             int currentSite = i;
 
-            // If inner for-cycle is inside of Runnable average execution time is ca. 6-6.5 sec
-
             for (int j = 0; j < repeats; j++) {
                 executor.submit(() -> {
 
-                    downloadSite(currentSite, "src/main/multi-output/site", true);
+                    downloadSite(currentSite, "src/main/multi-output/site");
                 });
             }
         }
-
         executor.shutdown();
         try {
             executor.awaitTermination(12, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        long end = System.currentTimeMillis();
-        System.out.println("OVERALL TIME: " + (end - start) + " ms");
+
 
     }
 
-    private static void downloadSite(int siteNumber, String path, boolean logging) {
+    private static void downloadSite(int siteNumber, String path) {
 
         try {
             Downloader downloader = new Downloader(sites[siteNumber], path + (siteNumber + 1) + ".html");
-            long startPiece = System.currentTimeMillis();
-
             downloader.download();
 
-            if (logging) {
-                System.out.println("site " + sites[siteNumber] + " done");
-                System.out.println("Time: " + (System.currentTimeMillis() - startPiece) + " ms");
-            }
         } catch (IOException e) {
             System.out.println("Could not download file " + (siteNumber + 1) + ".html");
         }
+
     }
 }
 
