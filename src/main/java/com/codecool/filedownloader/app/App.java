@@ -2,6 +2,8 @@ package com.codecool.filedownloader.app;
 
 import com.codecool.filedownloader.network.Downloader;
 import com.codecool.filedownloader.progress.ProgressManager;
+import com.codecool.filedownloader.view.ConsoleLogger;
+import com.codecool.filedownloader.view.Logger;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -21,14 +23,15 @@ public class App {
         sites.put("https://telex.hu/","telex");
         sites.put("https://www.origo.hu/index.html", "origo");
         sites.put("https://edition.cnn.com/", "cnn");
-        sites.put("https://news.sky.com/", "origo");
-        sites.put("https://www.rtl.de/", "origo");
+        sites.put("https://news.sky.com/", "sky");
+        sites.put("https://www.rtl.de/", "rtl");
     }
 
 
     public static void main(String[] args) throws IOException {
 
-        ProgressManager progressManager = new ProgressManager(THREADS, REPEATS);
+        Logger logger = new ConsoleLogger();
+        ProgressManager progressManager = new ProgressManager(logger, THREADS, REPEATS);
         createDownloads(progressManager);
         progressManager.downloadFilesWithOneThread();
         progressManager.downloadFilesWithMultipleThreads();
