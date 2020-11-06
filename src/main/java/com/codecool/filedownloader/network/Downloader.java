@@ -2,7 +2,6 @@ package com.codecool.filedownloader.network;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -15,7 +14,7 @@ public class Downloader {
     private final String domain;
     private final ReadableByteChannel readableByteChannel;
     private final FileChannel fileChannel;
-    private double progress = 0;
+    private long formerSize;
 
     public Downloader(String urlString, String domain, String filePath) throws IOException {
         this.url = new URL(urlString);
@@ -37,16 +36,21 @@ public class Downloader {
         return domain;
     }
 
-    public void resetProgress() {
-        progress = 0;
+
+    public long getCurrentSize() throws IOException {
+        return fileChannel.size();
     }
 
-    public double getProgress() {
-        return progress;
+    public int getContentLength() {
+        return contentLength;
     }
 
-    public void progress(double progress) {
-        this.progress += progress;
+    public long getFormerSize() {
+        return formerSize;
+    }
+
+    public void registerFormerSize() throws IOException {
+        this.formerSize = fileChannel.size();
     }
 
 }

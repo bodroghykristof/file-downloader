@@ -50,9 +50,6 @@ public class App {
             e.printStackTrace();
         }
 
-        /* Two different behaviours can be observed depending on whether single-thread operation
-        was performed beforehand or not */
-
         progressManager.downloadFilesWithMultipleThreads();
     }
 
