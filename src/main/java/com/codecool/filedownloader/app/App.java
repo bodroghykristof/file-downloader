@@ -10,8 +10,10 @@ import java.util.Map;
 
 public class App {
 
-    private static final int repeats = 5;
+    private static final int REPEATS = 5;
+    private static final int THREADS = 4;
     private static Map<String, String> sites = new HashMap<>();
+
     static {
         sites.put("https://www.bbc.com/", "bbc");
         sites.put("https://index.hu/", "index");
@@ -26,7 +28,7 @@ public class App {
 
     public static void main(String[] args) throws IOException {
 
-        ProgressManager progressManager = new ProgressManager(4);
+        ProgressManager progressManager = new ProgressManager(THREADS, REPEATS);
         createDownloads(progressManager);
         progressManager.downloadFilesWithOneThread();
         progressManager.downloadFilesWithMultipleThreads();
@@ -36,7 +38,7 @@ public class App {
 
     private static void createDownloads(ProgressManager progressManager) throws IOException {
         for (String site : sites.keySet()) {
-            Downloader downloader = new Downloader(site, sites.get(site), repeats);
+            Downloader downloader = new Downloader(site, sites.get(site));
             progressManager.addDownloadProcess(downloader);
         }
     }

@@ -12,9 +12,11 @@ public class ProgressManager {
 
     private final List<Downloader> downloads = new ArrayList<>();
     private final ExecutorService executor;
+    private final int repeats;
 
-    public ProgressManager(int threads) {
+    public ProgressManager(int threads, int repeats) {
         this.executor = Executors.newFixedThreadPool(threads);
+        this.repeats = repeats;
     }
 
     public boolean addDownloadProcess(Downloader downloader) {
@@ -26,11 +28,17 @@ public class ProgressManager {
     }
 
     public void downloadFilesWithOneThread() {
-        for (Downloader downloader : downloads) downloader.download("src/main/single-output/" + downloader.getDomain() + ".html");
+        for (Downloader downloader : downloads) {
+            downloadRepeatedly(downloader, "single");
+        }
     }
 
     public void downloadFilesWithMultipleThreads() {
-        for (Downloader downloader : downloads) executor.submit(() -> downloader.download("src/main/multi-output/" + downloader.getDomain() + ".html"));
+        for (Downloader downloader : downloads) {
+            executor.submit(() -> {
+                downloadRepeatedly(downloader, "multi");
+            });
+        }
 
         executor.shutdown();
 
@@ -38,6 +46,12 @@ public class ProgressManager {
             executor.awaitTermination(12, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void downloadRepeatedly(Downloader downloader, String mode) {
+        for (int i = 0; i < repeats; i++) {
+            downloader.download("src/main/" + mode + "-output/" + downloader.getDomain() + ".html");
         }
     }
 

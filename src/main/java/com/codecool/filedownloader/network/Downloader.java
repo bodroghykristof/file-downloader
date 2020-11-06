@@ -12,21 +12,18 @@ public class Downloader {
     private final URL url;
     private final String domain;
     private final ReadableByteChannel readableByteChannel;
-    private final int repeatTime;
+    private double progress = 0;
 
-    public Downloader(String urlString, String domain, int repeatTime) throws IOException {
+    public Downloader(String urlString, String domain) throws IOException {
         this.url = new URL(urlString);
         this.readableByteChannel = Channels.newChannel(url.openStream());
-        this.repeatTime = repeatTime;
         this.domain = domain;
     }
 
     public void download(String filePath) {
         try {
             FileChannel fileChannel = new FileOutputStream(filePath).getChannel();
-            for (int i = 0; i < repeatTime; i++) {
-                fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-            }
+            fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
         } catch (IOException e) {
             System.out.println("Could not download site " + url);
         }
@@ -34,6 +31,10 @@ public class Downloader {
 
     public String getDomain() {
         return domain;
+    }
+
+    public void progress(double progress) {
+        this.progress += progress;
     }
 
 }
