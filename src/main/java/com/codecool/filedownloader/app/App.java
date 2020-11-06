@@ -12,8 +12,7 @@ import java.util.Map;
 
 public class App {
 
-    private static final int REPEATS = 1;
-    private static final int THREADS = 4;
+    private static final int THREADS = 2;
     private static Map<String, String> sites = new HashMap<>();
 
     static {
@@ -35,10 +34,10 @@ public class App {
     public static void main(String[] args) throws IOException {
 
         Logger logger = new ConsoleLogger();
-        ProgressManager progressManager = new ProgressManager(logger, THREADS, REPEATS);
+        ProgressManager progressManager = new ProgressManager(logger, THREADS);
         createDownloads(progressManager);
 
-        progressManager.downloadFilesWithOneThread();
+//        progressManager.downloadFilesWithOneThread();
 //
 //        progressManager.resetProgresses();
 
@@ -54,7 +53,7 @@ public class App {
         /* Two different behaviours can be observed depending on whether single-thread operation
         was performed beforehand or not */
 
-//        progressManager.downloadFilesWithMultipleThreads();
+        progressManager.downloadFilesWithMultipleThreads();
     }
 
 
