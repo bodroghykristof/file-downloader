@@ -56,7 +56,12 @@ public class ProgressManager {
 
     private void downloadRepeatedly(Downloader downloader, String mode) {
         for (int i = 0; i < repeats; i++) {
-            downloader.download("src/main/" + mode + "-output/" + downloader.getDomain() + ".html");
+            downloader.download("../../src/main/" + mode + "-output/" + downloader.getDomain() + ".html");
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             downloader.progress(1.0 / repeats);
 
             List<DownloadLogData> currentState = downloads.stream().map(DownloadLogData::new).collect(Collectors.toList());
