@@ -10,16 +10,30 @@ import java.nio.channels.ReadableByteChannel;
 public class Downloader {
 
     private final URL url;
+    private final String domain;
     private final ReadableByteChannel readableByteChannel;
-    FileChannel fileChannel;
+    private final int repeatTime;
 
-    public Downloader(String urlString, String filePath) throws IOException {
+    public Downloader(String urlString, String domain, int repeatTime) throws IOException {
         this.url = new URL(urlString);
         this.readableByteChannel = Channels.newChannel(url.openStream());
-        this.fileChannel = new FileOutputStream(filePath).getChannel();
+        this.repeatTime = repeatTime;
+        this.domain = domain;
     }
 
-    public void download() throws IOException {
-        fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+    public void download(String filePath) {
+        try {
+            FileChannel fileChannel = new FileOutputStream(filePath).getChannel();
+            for (int i = 0; i < repeatTime; i++) {
+                fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+            }
+        } catch (IOException e) {
+            System.out.println("Could not download site " + url);
+        }
     }
+
+    public String getDomain() {
+        return domain;
+    }
+
 }

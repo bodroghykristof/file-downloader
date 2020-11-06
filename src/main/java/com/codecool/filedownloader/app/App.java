@@ -1,76 +1,45 @@
 package com.codecool.filedownloader.app;
 
 import com.codecool.filedownloader.network.Downloader;
+import com.codecool.filedownloader.progress.ProgressManager;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class App {
 
     private static final int repeats = 5;
-    private static String[] sites = new String[]{"https://www.bbc.com/",
-            "https://index.hu/",
-            "https://www.telegraph.co.uk/",
-            "https://telex.hu/",
-            "https://www.origo.hu/index.html",
-            "https://edition.cnn.com/",
-            "https://news.sky.com/",
-            "https://www.rtl.de/"};
+    private static Map<String, String> sites = new HashMap<>();
+    static {
+        sites.put("https://www.bbc.com/", "bbc");
+        sites.put("https://index.hu/", "index");
+        sites.put("https://www.telegraph.co.uk/", "telegraph");
+        sites.put("https://telex.hu/","telex");
+        sites.put("https://www.origo.hu/index.html", "origo");
+        sites.put("https://edition.cnn.com/", "cnn");
+        sites.put("https://news.sky.com/", "origo");
+        sites.put("https://www.rtl.de/", "origo");
+    }
 
-    private static ExecutorService executor = Executors.newFixedThreadPool(4);
 
     public static void main(String[] args) throws IOException {
 
-        downloadSingleThread();
-        downloadMultiThread();
+        ProgressManager progressManager = new ProgressManager(4);
+        createDownloads(progressManager);
+        progressManager.downloadFilesWithOneThread();
+        progressManager.downloadFilesWithMultipleThreads();
 
     }
 
-    private static void downloadSingleThread() {
 
-        for (int i = 0; i < sites.length; i++) {
-            for (int j = 0; j < repeats; j++) {
-                downloadSite(i, "src/main/single-output/site");
-            }
+    private static void createDownloads(ProgressManager progressManager) throws IOException {
+        for (String site : sites.keySet()) {
+            Downloader downloader = new Downloader(site, sites.get(site), repeats);
+            progressManager.addDownloadProcess(downloader);
         }
-
     }
 
-    private static void downloadMultiThread() {
-
-        for (int i = 0; i < sites.length; i++) {
-            int currentSite = i;
-
-            for (int j = 0; j < repeats; j++) {
-                executor.submit(() -> {
-
-                    downloadSite(currentSite, "src/main/multi-output/site");
-                });
-            }
-        }
-        executor.shutdown();
-        try {
-            executor.awaitTermination(12, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-    private static void downloadSite(int siteNumber, String path) {
-
-        try {
-            Downloader downloader = new Downloader(sites[siteNumber], path + (siteNumber + 1) + ".html");
-            downloader.download();
-
-        } catch (IOException e) {
-            System.out.println("Could not download file " + (siteNumber + 1) + ".html");
-        }
-
-    }
 }
 
