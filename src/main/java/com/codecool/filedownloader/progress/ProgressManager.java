@@ -55,6 +55,7 @@ public class ProgressManager {
     }
 
     private void downloadRepeatedly(Downloader downloader, String mode) {
+
         for (int i = 0; i < repeats; i++) {
             downloader.download("../../src/main/" + mode + "-output/" + downloader.getDomain() + ".html");
             try {
@@ -70,4 +71,7 @@ public class ProgressManager {
         }
     }
 
+    public void resetProgresses() {
+        downloads.forEach(Downloader::resetProgress);
+    }
 }

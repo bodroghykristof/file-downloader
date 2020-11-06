@@ -8,4 +8,5 @@ public interface Logger {
 
     void displayDownloadStates(List<DownloadLogData> downloads);
 
+    void clearScreen();
 }
