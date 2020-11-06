@@ -30,15 +30,13 @@ public class ProgressManager {
 
     public void downloadFilesWithOneThread() {
         for (Downloader downloader : downloads) {
-            downloader.download("../../src/main/single-output/" + downloader.getDomain() + ".html");
+            downloader.download();
         }
     }
 
     public void downloadFilesWithMultipleThreads() {
         for (Downloader downloader : downloads) {
-            executor.submit(() -> {
-                downloader.download("../../src/main/multi-output/" + downloader.getDomain() + ".html");
-            });
+            executor.submit(downloader::download);
         }
 
         executor.shutdown();
@@ -52,5 +50,9 @@ public class ProgressManager {
 
     public void resetProgresses() {
         downloads.forEach(Downloader::resetProgress);
+    }
+
+    private void monitorDownloads() {
+
     }
 }

@@ -59,7 +59,7 @@ public class App {
 
     private static void createDownloads(ProgressManager progressManager) throws IOException {
         for (String site : sites.keySet()) {
-            Downloader downloader = new Downloader(site, sites.get(site));
+            Downloader downloader = new Downloader(site, sites.get(site), "../../src/main/output/" + sites.get(site) + ".html");
             progressManager.addDownloadProcess(downloader);
         }
     }
