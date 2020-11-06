@@ -33,7 +33,19 @@ public class App {
         Logger logger = new ConsoleLogger();
         ProgressManager progressManager = new ProgressManager(logger, THREADS, REPEATS);
         createDownloads(progressManager);
-//        progressManager.downloadFilesWithOneThread();
+        progressManager.downloadFilesWithOneThread();
+        progressManager.resetProgresses();
+        try {
+            Thread.sleep(1000);
+            logger.clearScreen();
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        /* Two different behaviours can be observed depending on whether single-thread operation
+        was performed beforehand or not */
+
         progressManager.downloadFilesWithMultipleThreads();
     }
 

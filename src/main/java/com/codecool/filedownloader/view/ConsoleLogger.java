@@ -7,7 +7,7 @@ import java.util.List;
 public class ConsoleLogger implements Logger {
 
     @Override
-    public void displayDownloadStates(List<DownloadLogData> downloads) {
+    public synchronized void displayDownloadStates(List<DownloadLogData> downloads) {
         int domainColumnLength = 12;
         int progressFullLength = 20;
         clearScreen();
@@ -25,7 +25,8 @@ public class ConsoleLogger implements Logger {
         }
     }
 
-    private void clearScreen() {
+    @Override
+    public void clearScreen() {
         System.out.print("\033[H\033[J");
         System.out.flush();
     }

@@ -33,6 +33,10 @@ public class Downloader {
         return domain;
     }
 
+    public void resetProgress() {
+        progress = 0;
+    }
+
     public double getProgress() {
         return progress;
     }
