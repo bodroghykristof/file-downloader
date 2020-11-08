@@ -46,17 +46,20 @@ public class ProgressManager {
 
         try {
             executor.awaitTermination(12, TimeUnit.SECONDS);
+//            executor.shutdownNow();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
 
-    private void monitorDownloads() throws IOException {
+    public void monitorDownloads() throws IOException {
 
         List<DownloadLogData> downloadLogData;
 
-        while (true) {
+        while (!allDownloadsCompleted()) {
+
+            System.out.println("called");
 
             downloadLogData = new ArrayList<>();
 
@@ -71,5 +74,9 @@ public class ProgressManager {
             for (Downloader downloader : downloads) downloadLogData.add(new DownloadLogData(downloader, UPDATE_FREQUENCY));
 
         }
+    }
+
+    private boolean allDownloadsCompleted() {
+        return downloads.stream().allMatch(downloader -> downloader.getContentLength() == downloader.getFormerSize());
     }
 }
