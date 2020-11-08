@@ -4,24 +4,22 @@ import com.codecool.filedownloader.network.DownloadLogData;
 import com.codecool.filedownloader.network.Downloader;
 import com.codecool.filedownloader.view.Logger;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class ProgressManager {
 
+    public static final int UPDATE_FREQUENCY = 1000;
     private final List<Downloader> downloads = new ArrayList<>();
     private final Logger logger;
     private final ExecutorService executor;
-    private final int repeats;
 
-    public ProgressManager(Logger logger, int threads, int repeats) {
+    public ProgressManager(Logger logger, int threads) {
         this.logger = logger;
         this.executor = Executors.newFixedThreadPool(threads);
-        this.repeats = repeats;
     }
 
     public boolean addDownloadProcess(Downloader downloader) {
@@ -34,44 +32,37 @@ public class ProgressManager {
 
     public void downloadFilesWithOneThread() {
         for (Downloader downloader : downloads) {
-            downloadRepeatedly(downloader, "single");
+            downloader.download();
         }
     }
 
     public void downloadFilesWithMultipleThreads() {
-        for (Downloader downloader : downloads) {
-            executor.submit(() -> {
-                downloadRepeatedly(downloader, "multi");
-            });
-        }
-
+        for (Downloader downloader : downloads) executor.submit(downloader::download);
         executor.shutdown();
-
-        try {
-            executor.awaitTermination(12, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
-    private void downloadRepeatedly(Downloader downloader, String mode) {
 
-        for (int i = 0; i < repeats; i++) {
-            downloader.download("../../src/main/" + mode + "-output/" + downloader.getDomain() + ".html");
+    public void monitorDownloads() throws IOException {
+
+        List<DownloadLogData> downloadLogData;
+
+        while (!allDownloadsCompleted()) {
+
+            downloadLogData = new ArrayList<>();
+            for (Downloader downloader : downloads) downloader.registerFormerSize();
+
             try {
-                Thread.sleep(500);
+                Thread.sleep(UPDATE_FREQUENCY);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            downloader.progress(1.0 / repeats);
 
-            List<DownloadLogData> currentState = downloads.stream().map(DownloadLogData::new).collect(Collectors.toList());
-            logger.displayDownloadStates(currentState);
-
+            for (Downloader downloader : downloads) downloadLogData.add(new DownloadLogData(downloader, UPDATE_FREQUENCY));
+            logger.displayDownloadStates(downloadLogData);
         }
     }
 
-    public void resetProgresses() {
-        downloads.forEach(Downloader::resetProgress);
+    private boolean allDownloadsCompleted() {
+        return downloads.stream().allMatch(downloader -> downloader.getContentLength() == downloader.getFormerSize());
     }
 }

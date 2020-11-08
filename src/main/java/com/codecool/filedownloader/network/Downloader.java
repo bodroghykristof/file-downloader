@@ -10,19 +10,22 @@ import java.nio.channels.ReadableByteChannel;
 public class Downloader {
 
     private final URL url;
+    private int contentLength;
     private final String domain;
     private final ReadableByteChannel readableByteChannel;
-    private double progress = 0;
+    private final FileChannel fileChannel;
+    private long formerSize;
 
-    public Downloader(String urlString, String domain) throws IOException {
+    public Downloader(String urlString, String domain, String filePath) throws IOException {
         this.url = new URL(urlString);
-        this.readableByteChannel = Channels.newChannel(url.openStream());
+        this.contentLength = url.openConnection().getContentLength();
         this.domain = domain;
+        this.readableByteChannel = Channels.newChannel(url.openStream());
+        this.fileChannel = new FileOutputStream(filePath).getChannel();
     }
 
-    public void download(String filePath) {
+    public void download() {
         try {
-            FileChannel fileChannel = new FileOutputStream(filePath).getChannel();
             fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
         } catch (IOException e) {
             System.out.println("Could not download site " + url);
@@ -33,16 +36,21 @@ public class Downloader {
         return domain;
     }
 
-    public void resetProgress() {
-        progress = 0;
+
+    public long getCurrentSize() throws IOException {
+        return fileChannel.size();
     }
 
-    public double getProgress() {
-        return progress;
+    public int getContentLength() {
+        return contentLength;
     }
 
-    public void progress(double progress) {
-        this.progress += progress;
+    public long getFormerSize() {
+        return formerSize;
+    }
+
+    public void registerFormerSize() throws IOException {
+        this.formerSize = fileChannel.size();
     }
 
 }

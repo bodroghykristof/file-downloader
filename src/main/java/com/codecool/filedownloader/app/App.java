@@ -12,47 +12,31 @@ import java.util.Map;
 
 public class App {
 
-    private static final int REPEATS = 5;
-    private static final int THREADS = 4;
+    private static final int THREADS = 2;
     private static Map<String, String> sites = new HashMap<>();
 
     static {
-        sites.put("https://www.bbc.com/", "bbc");
-        sites.put("https://index.hu/", "index");
-        sites.put("https://www.telegraph.co.uk/", "telegraph");
-        sites.put("https://telex.hu/","telex");
-        sites.put("https://www.origo.hu/index.html", "origo");
+
+//        sites.put("http://www.fsn.hu/testfiles/1GiB", "fsn");
         sites.put("https://edition.cnn.com/", "cnn");
         sites.put("https://news.sky.com/", "sky");
-        sites.put("https://www.rtl.de/", "rtl");
+        sites.put("https://dlcdnets.asus.com/pub/ASUS/nb/DriversForWin10/VGA/Graphic_IGCC_DCH_Intel_F_V27.20.100.8190_18337.exe", "asus");
+
     }
 
 
     public static void main(String[] args) throws IOException {
-
         Logger logger = new ConsoleLogger();
-        ProgressManager progressManager = new ProgressManager(logger, THREADS, REPEATS);
+        ProgressManager progressManager = new ProgressManager(logger, THREADS);
         createDownloads(progressManager);
-        progressManager.downloadFilesWithOneThread();
-        progressManager.resetProgresses();
-        try {
-            Thread.sleep(1000);
-            logger.clearScreen();
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        /* Two different behaviours can be observed depending on whether single-thread operation
-        was performed beforehand or not */
-
         progressManager.downloadFilesWithMultipleThreads();
+        progressManager.monitorDownloads();
     }
 
 
     private static void createDownloads(ProgressManager progressManager) throws IOException {
         for (String site : sites.keySet()) {
-            Downloader downloader = new Downloader(site, sites.get(site));
+            Downloader downloader = new Downloader(site, sites.get(site), "../../src/main/output/" + sites.get(site));
             progressManager.addDownloadProcess(downloader);
         }
     }
