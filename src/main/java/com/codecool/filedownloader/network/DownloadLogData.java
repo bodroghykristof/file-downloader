@@ -23,6 +23,19 @@ public class DownloadLogData {
         return domain;
     }
 
+    public long getContentLength() {
+        return contentLength;
+    }
 
+    public long getFormerSize() {
+        return formerSize;
+    }
 
+    public long getCurrentSize() {
+        return currentSize;
+    }
+
+    public int getTimeElapsed() {
+        return timeElapsed;
+    }
 }

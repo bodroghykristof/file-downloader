@@ -9,11 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class ProgressManager {
 
-    public static final int UPDATE_FREQUENCY = 500;
+    public static final int UPDATE_FREQUENCY = 1000;
     private final List<Downloader> downloads = new ArrayList<>();
     private final Logger logger;
     private final ExecutorService executor;
@@ -38,18 +37,8 @@ public class ProgressManager {
     }
 
     public void downloadFilesWithMultipleThreads() {
-        for (Downloader downloader : downloads) {
-            executor.submit(downloader::download);
-        }
-
+        for (Downloader downloader : downloads) executor.submit(downloader::download);
         executor.shutdown();
-
-        try {
-            executor.awaitTermination(12, TimeUnit.SECONDS);
-//            executor.shutdownNow();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
 
@@ -59,10 +48,7 @@ public class ProgressManager {
 
         while (!allDownloadsCompleted()) {
 
-            System.out.println("called");
-
             downloadLogData = new ArrayList<>();
-
             for (Downloader downloader : downloads) downloader.registerFormerSize();
 
             try {
@@ -72,7 +58,7 @@ public class ProgressManager {
             }
 
             for (Downloader downloader : downloads) downloadLogData.add(new DownloadLogData(downloader, UPDATE_FREQUENCY));
-
+            logger.displayDownloadStates(downloadLogData);
         }
     }
 
